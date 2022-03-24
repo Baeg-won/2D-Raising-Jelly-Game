@@ -13,15 +13,39 @@ public class GameManager : MonoBehaviour
 
     public int[] jelly_goldlist;
     public bool isSell;
+    public bool isLive;
 
     public RuntimeAnimatorController[] level_ac;
 
     public Text jelatin_text;
     public Text gold_text;
 
+    public Image jelly_panel;
+    public Image plant_panel;
+    public Image option_panel;
+
+    Animator jelly_anim;
+    Animator plant_anim;
+
+    bool isJellyClick;
+    bool isPlantClick;
+    bool isOption;
+
     void Awake()
     {
-        isSell = false;
+        jelly_anim = jelly_panel.GetComponent<Animator>();
+        plant_anim = plant_panel.GetComponent<Animator>();
+
+        isLive = true;
+    }
+
+    void Update()
+    {
+        if (Input.GetButtonDown("Cancel")) {
+            if (isJellyClick) ClickJellyBtn();
+            else if (isPlantClick) ClickPlantBtn();
+            else Option();
+        }
     }
 
     void LateUpdate()
@@ -54,5 +78,48 @@ public class GameManager : MonoBehaviour
     public void CheckSell()
     {
         isSell = isSell == false;
+    }
+
+    public void ClickJellyBtn()
+    {
+        if (isPlantClick) {
+            plant_anim.SetTrigger("doHide");
+            isPlantClick = false;
+            isLive = true;
+        }   
+
+        if (isJellyClick)
+            jelly_anim.SetTrigger("doHide");
+        else
+            jelly_anim.SetTrigger("doShow");
+
+        isJellyClick = !isJellyClick;
+        isLive = !isLive;
+    }
+
+    public void ClickPlantBtn()
+    {
+        if (isJellyClick) {
+            jelly_anim.SetTrigger("doHide");
+            isJellyClick = false;
+            isLive = true;
+        }
+
+        if (isPlantClick)
+            plant_anim.SetTrigger("doHide");
+        else
+            plant_anim.SetTrigger("doShow");
+
+        isPlantClick = !isPlantClick;
+        isLive = !isLive;
+    }
+
+    void Option()
+    {
+        isOption = !isOption;
+        isLive = !isLive;
+
+        option_panel.gameObject.SetActive(isOption);
+        Time.timeScale = isOption == true ? 0 : 1;
     }
 }

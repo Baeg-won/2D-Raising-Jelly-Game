@@ -65,6 +65,8 @@ public class Jelly : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (!game_manager.isLive) return;
+
         isWalking = false;
         anim.SetBool("isWalk", false);
         anim.SetTrigger("doTouch");
@@ -76,6 +78,8 @@ public class Jelly : MonoBehaviour
 
     void OnMouseDrag()
     {
+        if (!game_manager.isLive) return;
+
         pick_time += Time.deltaTime;
 
         if (pick_time < 0.1f) return;
@@ -92,6 +96,8 @@ public class Jelly : MonoBehaviour
 
     void OnMouseUp()
     {
+        if (!game_manager.isLive) return;
+
         pick_time = 0;
 
         if (game_manager.isSell) {
