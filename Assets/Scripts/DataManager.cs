@@ -10,6 +10,8 @@ public class SaveData
     public int gold;
     public bool[] jelly_unlock_list = new bool[12];
     public List<Data> jelly_list = new List<Data>();
+    public int num_level;
+    public int click_level;
 }
 
 public class DataManager : MonoBehaviour
@@ -29,6 +31,8 @@ public class DataManager : MonoBehaviour
         if (!File.Exists(path)) {
             GameManager.instance.jelatin = 0;
             GameManager.instance.gold = 0;
+            GameManager.instance.num_level = 1;
+            GameManager.instance.click_level = 1;
             JsonSave();
         }
         else {
@@ -42,6 +46,8 @@ public class DataManager : MonoBehaviour
                     GameManager.instance.jelly_unlock_list[i] = save_data.jelly_unlock_list[i];
                 GameManager.instance.jelatin = save_data.jelatin;
                 GameManager.instance.gold = save_data.gold;
+                GameManager.instance.num_level = save_data.num_level;
+                GameManager.instance.click_level = save_data.click_level;
             }
         }
     }
@@ -58,6 +64,8 @@ public class DataManager : MonoBehaviour
             save_data.jelly_unlock_list[i] = GameManager.instance.jelly_unlock_list[i];
         save_data.jelatin = GameManager.instance.jelatin;
         save_data.gold = GameManager.instance.gold;
+        save_data.num_level = GameManager.instance.num_level;
+        save_data.click_level = GameManager.instance.click_level;
 
         string json = JsonUtility.ToJson(save_data, true);
 

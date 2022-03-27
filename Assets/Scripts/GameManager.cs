@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     public List<Jelly> jelly_list = new List<Jelly>();
     public List<Data> jelly_data_list = new List<Data>();
     public bool[] jelly_unlock_list;
+    public int num_level;
+    public int click_level;
 
     public int max_jelatin;
     public int max_gold;
@@ -23,6 +25,9 @@ public class GameManager : MonoBehaviour
     public string[] jelly_namelist;
     public int[] jelly_jelatinlist;
     public int[] jelly_goldlist;
+
+    public int[] num_gold_list;
+    public int[] click_gold_list;
 
     public Text page_text;
     public Image unlock_group_jelly_img;
@@ -46,6 +51,14 @@ public class GameManager : MonoBehaviour
 
     public GameObject data_manager_obj;
 
+    public Text num_sub_text;
+    public Text num_btn_text;
+    public Button num_btn;
+
+    public Text click_sub_text;
+    public Text click_btn_text;
+    public Button click_btn;
+
     DataManager data_manager;
 
     Animator jelly_anim;
@@ -65,11 +78,6 @@ public class GameManager : MonoBehaviour
         plant_anim = plant_panel.GetComponent<Animator>();
 
         isLive = true;
-
-        jelatin_text.text = jelatin.ToString();
-        gold_text.text = gold.ToString();
-        unlock_group_gold_text.text = jelly_goldlist[0].ToString();
-        lock_group_jelatin_text.text = jelly_jelatinlist[0].ToString();
 
         data_manager = data_manager_obj.GetComponent<DataManager>();
 
@@ -104,7 +112,7 @@ public class GameManager : MonoBehaviour
 
     public void GetJelatin(int id, int level)
     {
-        jelatin += (id + 1) * level;
+        jelatin += (id + 1) * level * click_level;
 
         if (jelatin > max_jelatin)
             jelatin = max_jelatin;
@@ -217,7 +225,7 @@ public class GameManager : MonoBehaviour
 
     public void BuyJelly()
     {
-        if (gold < jelly_goldlist[page]) return;
+        if (gold < jelly_goldlist[page] || jelly_list.Count >= num_level * 2) return;
 
         gold -= jelly_goldlist[page];
 
@@ -230,9 +238,46 @@ public class GameManager : MonoBehaviour
         jelly_list.Add(jelly);
     }
 
+    public void NumUpgrade()
+    {
+        if (gold < num_gold_list[num_level]) return;
+
+        gold -= num_gold_list[num_level++];
+
+        num_sub_text.text = "젤리 수용량 " + num_level * 2;
+
+        if (num_level >= 5) num_btn.gameObject.SetActive(false);
+        else num_btn_text.text = string.Format("{0:n0}", num_gold_list[num_level]);
+    }
+
+    public void ClickUpgrade()
+    {
+        if (gold < click_gold_list[click_level]) return;
+
+        gold -= click_gold_list[click_level++];
+
+        click_sub_text.text = "클릭 생산량 X " + click_level;
+
+        if (click_level >= 5) click_btn.gameObject.SetActive(false);
+        else click_btn_text.text = string.Format("{0:n0}", click_gold_list[click_level]);
+    }
+
     void LoadData()
     {
+        jelatin_text.text = jelatin.ToString();
+        gold_text.text = gold.ToString();
+        unlock_group_gold_text.text = jelly_goldlist[0].ToString();
+        lock_group_jelatin_text.text = jelly_jelatinlist[0].ToString();
+
         lock_group.gameObject.SetActive(!jelly_unlock_list[page]);
+
+        num_sub_text.text = "젤리 수용량 " + num_level * 2;
+        if (num_level >= 5) num_btn.gameObject.SetActive(false);
+        else num_btn_text.text = string.Format("{0:n0}", num_gold_list[num_level]);
+
+        click_sub_text.text = "클릭 생산량 X " + click_level;
+        if (click_level >= 5) click_btn.gameObject.SetActive(false);
+        else click_btn_text.text = string.Format("{0:n0}", click_gold_list[click_level]);
 
         for (int i = 0; i < jelly_data_list.Count; ++i)
         {
