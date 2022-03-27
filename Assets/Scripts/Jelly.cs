@@ -8,12 +8,17 @@ public class Jelly : MonoBehaviour
     public int id;
     public int level;
     public float exp;
+
     public float required_exp;
     public float max_exp;
 
+    public GameObject game_manager_obj;
     public GameManager game_manager;
     public GameObject left_top;
     public GameObject right_bottom;
+
+    public SpriteRenderer sprite_renderer;
+    public Animator anim;
 
     float pick_time;
 
@@ -26,16 +31,37 @@ public class Jelly : MonoBehaviour
     bool isWandering;
     bool isWalking;
 
-    SpriteRenderer sprite;
-    Animator anim;
+    GameObject shadow;
+    float shadow_pos_y;
+
+    int jelatin_delay;
+    bool isGetting;
 
     void Awake()
     {
-        sprite = GetComponent<SpriteRenderer>();
+        left_top = GameObject.Find("LeftTop").gameObject;
+        right_bottom = GameObject.Find("RightBottom").gameObject;
+        game_manager_obj = GameObject.Find("GameManager").gameObject;
+        game_manager = game_manager_obj.GetComponent<GameManager>();
+
+        sprite_renderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
         isWandering = false;
         isWalking = false;
+        isGetting = false;
+
+        shadow = transform.Find("Shadow").gameObject;
+        switch (id) {
+            case 0: shadow_pos_y = -0.05f; break;
+            case 6: shadow_pos_y = -0.12f; break;
+            case 3: shadow_pos_y = -0.14f; break;
+            case 10: shadow_pos_y = -0.16f; break;
+            case 11: shadow_pos_y = -0.16f; break;
+            default: shadow_pos_y = -0.05f; break;
+        }
+
+        shadow.transform.localPosition = new Vector3(0, shadow_pos_y, 0);
     }
 
     void Update()
@@ -45,6 +71,10 @@ public class Jelly : MonoBehaviour
 
         if (exp > required_exp * level && level < 3)
             game_manager.ChangeAc(anim, ++level);
+
+        if (!isGetting)
+            StartCoroutine(GetJelatin());
+            
     }
 
     void FixedUpdate()
@@ -101,7 +131,7 @@ public class Jelly : MonoBehaviour
         pick_time = 0;
 
         if (game_manager.isSell) {
-            game_manager.GetGold(id, level);
+            game_manager.GetGold(id, level, this);
 
             Destroy(gameObject);
         }
@@ -117,15 +147,15 @@ public class Jelly : MonoBehaviour
     void Move()
     {
         if (speed_x != 0)
-            sprite.flipX = speed_x < 0;
+            sprite_renderer.flipX = speed_x < 0;
 
         transform.Translate(speed_x, speed_y, speed_y);
     }
 
     IEnumerator Wander()
     {
-        move_delay = 6;
-        move_time = 3;
+        move_delay = Random.Range(3, 6);
+        move_time = Random.Range(3, 6);
         speed_x = Random.Range(-0.8f, 0.8f) * Time.deltaTime;
         speed_y = Random.Range(-0.8f, 0.8f) * Time.deltaTime;
 
@@ -142,5 +172,17 @@ public class Jelly : MonoBehaviour
         anim.SetBool("isWalk", false);
 
         isWandering = false;
+    }
+
+    IEnumerator GetJelatin()
+    {
+        jelatin_delay = 3;
+
+        isGetting = true;
+        game_manager.GetJelatin(id, level);
+
+        yield return new WaitForSeconds(jelatin_delay);
+
+        isGetting = false;
     }
 }
