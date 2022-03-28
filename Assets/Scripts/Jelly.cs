@@ -69,12 +69,13 @@ public class Jelly : MonoBehaviour
         if(exp < max_exp)
             exp += Time.deltaTime;
 
-        if (exp > required_exp * level && level < 3)
+        if (exp > required_exp * level && level < 3) {
+            isWalking = false;
             game_manager.ChangeAc(anim, ++level);
+        }
 
         if (!isGetting)
             StartCoroutine(GetJelatin());
-            
     }
 
     void FixedUpdate()
@@ -104,6 +105,7 @@ public class Jelly : MonoBehaviour
         if(exp < max_exp) ++exp;
 
         game_manager.GetJelatin(id, level);
+        SoundManager.instance.PlaySound("Touch");
     }
 
     void OnMouseDrag()

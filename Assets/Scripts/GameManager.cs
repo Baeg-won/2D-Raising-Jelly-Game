@@ -108,6 +108,8 @@ public class GameManager : MonoBehaviour
     public void ChangeAc(Animator anim, int level)
     {
         anim.runtimeAnimatorController = level_ac[level - 1];
+
+        SoundManager.instance.PlaySound("Grow");
     }
 
     public void GetJelatin(int id, int level)
@@ -126,6 +128,8 @@ public class GameManager : MonoBehaviour
             gold = max_gold;
 
         jelly_list.Remove(jelly);
+
+        SoundManager.instance.PlaySound("Sell");
     }
 
     public void CheckSell()
@@ -148,6 +152,8 @@ public class GameManager : MonoBehaviour
 
         isJellyClick = !isJellyClick;
         isLive = !isLive;
+
+        SoundManager.instance.PlaySound("Button");
     }
 
     public void ClickPlantBtn()
@@ -165,31 +171,46 @@ public class GameManager : MonoBehaviour
 
         isPlantClick = !isPlantClick;
         isLive = !isLive;
+
+        SoundManager.instance.PlaySound("Button");
     }
 
-    void Option()
+    public void Option()
     {
         isOption = !isOption;
         isLive = !isLive;
 
         option_panel.gameObject.SetActive(isOption);
         Time.timeScale = isOption == true ? 0 : 1;
+
+        if (isOption) SoundManager.instance.PlaySound("Pause In");
+        else SoundManager.instance.PlaySound("Pause Out");
     }
 
     public void PageUp()
     {
-        if (page >= 11) return;
+        if (page >= 11) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         ++page;
         ChangePage();
+
+        SoundManager.instance.PlaySound("Button");
     }
 
     public void PageDown()
     {
-        if (page <= 0) return;
+        if (page <= 0) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         --page;
         ChangePage();
+
+        SoundManager.instance.PlaySound("Button");
     }
 
     void ChangePage()
@@ -215,17 +236,25 @@ public class GameManager : MonoBehaviour
 
     public void Unlock()
     {
-        if (jelatin < jelly_jelatinlist[page]) return;
+        if (jelatin < jelly_jelatinlist[page]) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         jelly_unlock_list[page] = true;
         ChangePage();
 
         jelatin -= jelly_jelatinlist[page];
+
+        SoundManager.instance.PlaySound("Unlock");
     }
 
     public void BuyJelly()
     {
-        if (gold < jelly_goldlist[page] || jelly_list.Count >= num_level * 2) return;
+        if (gold < jelly_goldlist[page] || jelly_list.Count >= num_level * 2) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         gold -= jelly_goldlist[page];
 
@@ -236,11 +265,16 @@ public class GameManager : MonoBehaviour
         jelly.sprite_renderer.sprite = jelly_spritelist[page];
 
         jelly_list.Add(jelly);
+
+        SoundManager.instance.PlaySound("Buy");
     }
 
     public void NumUpgrade()
     {
-        if (gold < num_gold_list[num_level]) return;
+        if (gold < num_gold_list[num_level]) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         gold -= num_gold_list[num_level++];
 
@@ -248,11 +282,16 @@ public class GameManager : MonoBehaviour
 
         if (num_level >= 5) num_btn.gameObject.SetActive(false);
         else num_btn_text.text = string.Format("{0:n0}", num_gold_list[num_level]);
+
+        SoundManager.instance.PlaySound("Unlock");
     }
 
     public void ClickUpgrade()
     {
-        if (gold < click_gold_list[click_level]) return;
+        if (gold < click_gold_list[click_level]) {
+            SoundManager.instance.PlaySound("Fail");
+            return;
+        }
 
         gold -= click_gold_list[click_level++];
 
@@ -260,6 +299,8 @@ public class GameManager : MonoBehaviour
 
         if (click_level >= 5) click_btn.gameObject.SetActive(false);
         else click_btn_text.text = string.Format("{0:n0}", click_gold_list[click_level]);
+
+        SoundManager.instance.PlaySound("Unlock");
     }
 
     void LoadData()
@@ -294,8 +335,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void OnApplicationQuit()
+    public void Exit()
     {
         data_manager.JsonSave();
+
+        SoundManager.instance.PlaySound("Pause Out");
+
+        Application.Quit();
     }
 }
